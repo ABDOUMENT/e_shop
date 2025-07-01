@@ -1,0 +1,35 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-body">
+
+  <script>
+     const user = JSON.parse(localStorage.getItem('loggedInUser'));
+     if (user) {
+       window.location.href = 'index.html';
+     }
+  </script>
+
+  <div class="auth-container">
+    <img src="logo2.jpg" alt="Logo" class="login-logo">
+    <h2>Login</h2>
+    <form id="login-form">
+      <label>Username:</label>
+      <input type="text" id="login-username" required>
+
+      <label>Password:</label>
+      <input type="password" id="login-password" required>
+
+      <button type="submit">Login</button>
+    </form>
+
+    <p>Don't have an account? <a href="signup.html">Signup</a></p>
+  </div>
+
+  <script src="auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Product Details</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="product-detail">
+    <h1 id="product-title">Loading...</h1>
+    <img id="product-image" src="" alt="Product" style="width: 300px; border-radius: 10px;">
+    <p id="product-description"></p>
+    <div id="product-video"></div>
+    <div id="command-button-container"></div>
+    <button onclick="window.history.back()">← Back</button>
+  </div>
+
+  <!-- Order Modal -->
+  <div id="order-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeOrderModal()">&times;</span>
+      <h2>Confirm Your Order</h2>
+      <form id="order-form">
+        <label>Quantity:</label>
+        <input type="number" id="order-quantity" min="1" required>
+
+        <label>Address:</label>
+        <input type="text" id="order-address" required>
+
+        <label>Phone Number:</label>
+        <input type="text" id="order-phone" required>
+
+        <input type="hidden" id="order-product-id">
+        <button type="submit">Place Order</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+    const productId = localStorage.getItem("selectedProduct");
+    const products = JSON.parse(localStorage.getItem("dynamicProducts") || "[]");
+    const product = products[productId];
+
+    if (product) {
+      document.getElementById("product-title").textContent = product.title;
+      document.getElementById("product-image").src = product.image;
+      document.getElementById("product-description").textContent = product.description;
+
+      if (product.video) {
+        document.getElementById("product-video").innerHTML = `
+          <iframe width="400" height="225" src="${product.video}" frameborder="0" allowfullscreen></iframe>
+        `;
+      }
+
+      if (user && user.role === "client") {
+        document.getElementById("command-button-container").innerHTML = `
+          <button onclick="openOrderModal(${productId})">🛒 Command</button>
+        `;
+      }
+
+    } else {
+      document.body.innerHTML = "<p>Product not found</p>";
+    }
+
+    // Modal Functions
+    function openOrderModal(index) {
+      document.getElementById("order-modal").style.display = "block";
+      document.getElementById("order-product-id").value = index;
+    }
+
+    function closeOrderModal() {
+      document.getElementById("order-modal").style.display = "none";
+    }
+
+    document.getElementById("order-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const productId = parseInt(document.getElementById("order-product-id").value);
+      const quantity = parseInt(document.getElementById("order-quantity").value);
+      const address = document.getElementById("order-address").value;
+      const phone = document.getElementById("order-phone").value;
+
+      const product = products[productId];
+
+      const order = {
+        product: product.title,
+        quantity,
+        address,
+        phone,
+        user: user.username,
+        owner: product.owner || 'unknown',
+        timestamp: new Date().toLocaleString()
+      };
+
+      const existingOrders = JSON.parse(localStorage.getItem("orders") || "[]");
+      existingOrders.push(order);
+      localStorage.setItem("orders", JSON.stringify(existingOrders));
+
+      alert("✅ Order placed successfully!");
+      closeOrderModal();
+    });
+  </script>
+</body>
+</html>
